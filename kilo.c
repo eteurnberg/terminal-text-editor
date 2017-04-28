@@ -23,6 +23,7 @@ struct editorConfig {
 };
 
 struct editorConfig E;
+
 /*** terminal ***/
 
 void die(const char *s) {
