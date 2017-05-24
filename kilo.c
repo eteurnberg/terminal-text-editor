@@ -8,11 +8,17 @@
 #include <termios.h>
 #include <unistd.h>
 
-/*** defines ***/
-
+/*** defines ***/ 
 #define KILO_VERSION "0.0.1"
 
 #define CTRL_KEY(k) ((k) & 0x1f)
+
+enum editorKey {
+  ARROW_LEFT = 1000,
+  ARROW_RIGHT,
+  ARROW_UP,
+  ARROW_DOWN
+};
 
 /*** data ***/
 
@@ -55,7 +61,7 @@ void enableRawMode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
-char editorReadKey() {
+int editorReadKey() {
   int nread;
   char c;
   while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
@@ -69,10 +75,10 @@ char editorReadKey() {
 
     if (seq[0] == '[') {
       switch (seq[1]) {
-        case 'A': return 'k';
-        case 'B': return 'j';
-        case 'C': return 'l';
-        case 'D': return 'h';
+        case 'A': return ARROW_UP;
+        case 'B': return ARROW_DOWN;
+        case 'C': return ARROW_RIGHT;
+        case 'D': return ARROW_LEFT;
       }
     }
 
@@ -184,25 +190,33 @@ void editorRefreshScreen() {
 
 /*** input ***/
 
-void editorMoveCursor(char key) {
+void editorMoveCursor(int key) {
   switch(key) {
-    case 'h':
-      E.cx--;
+    case ARROW_LEFT:
+      if (E.cx != 0) {
+        E.cx--;
+      }
       break;
-    case 'l':
-      E.cx++;
+    case ARROW_RIGHT:
+      if (E.cx != E.screencols - 1) {
+        E.cx++;
+      }
       break;
-    case 'k':
-      E.cy--;
+    case ARROW_UP:
+      if (E.cy != 0) {
+        E.cy--;
+      }
       break;
-    case 'j':
-      E.cy++;
+    case ARROW_DOWN:
+      if (E.cy != E.screenrows - 1) {
+        E.cy++;
+      }
       break;
   }
 }
 
 void editorProcessKeyPress() {
-  char c = editorReadKey();
+  int c = editorReadKey();
 
   switch(c) {
     case CTRL_KEY('b'):
@@ -210,10 +224,10 @@ void editorProcessKeyPress() {
       write(STDOUT_FILENO, "\x1b[H", 3);
       exit(0);
       break;
-    case 'h':
-    case 'l':
-    case 'k':
-    case 'j':
+    case ARROW_UP:
+    case ARROW_DOWN:
+    case ARROW_LEFT:
+    case ARROW_RIGHT:
       editorMoveCursor(c);
       break;
   }
