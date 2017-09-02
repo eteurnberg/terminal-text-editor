@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 /*** defines ***/ 
-#define KILO_VERSION "0.0.1"
+#define MICRA_VERSION "0.0.2"
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
@@ -150,7 +150,7 @@ void editorDrawRows(struct abuf *ab) {
   for (y = 0; y < E.screenrows; y++) {
     if (y == E.screenrows / 3) {
         char welcome[80];
-        int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
+        int welcomelen = snprintf(welcome, sizeof(welcome), "Micra editor -- version %s", MICRA_VERSION);
         if (welcomelen > E.screencols) welcomelen = E.screencols;
         int padding = (E.screencols - welcomelen) / 2;
         if (padding) {
